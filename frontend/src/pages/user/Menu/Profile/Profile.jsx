@@ -7,6 +7,7 @@ import { FaChevronRight, FaEdit, FaSignOutAlt } from "react-icons/fa";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
+import Swal from "sweetalert2";
 import axiosBaseUrl from "$/axios";
 import tempDP from "@/assets/HomePage/grid9.jpeg";
 import HeaderSection from "@/components/HeaderSection";
@@ -50,9 +51,20 @@ useEffect(()=>{
 
 },[])
 
-const handleLogout=useCallback(()=>{
-    if(!window.confirm("Are you sure to Logout")) {
-        return;
+const handleLogout=useCallback(async()=>{
+  
+    const sureToDel = await Swal.fire({
+        title: "Sure to Logout",
+        icon: "question",
+        iconHtml: "؟",
+        confirmButtonText: "Logout",
+        cancelButtonText: "Not",
+        showCancelButton: true,
+        showCloseButton: true
+      });
+  
+    if(!sureToDel.isConfirmed) {
+      return;
     }
 
     let keysToDelete = [];
@@ -155,6 +167,12 @@ const handleLogout=useCallback(()=>{
                     <span className="font-medium">Phone:</span>{" "}
                     {user?.phone || "+9867345350"}
                   </p>
+                  { user?.referralCode &&
+                  <p>
+                    <span className="font-medium">ReferralCode:</span>{" "}
+                    {user?.referralCode || "+9867345350"}
+                  </p>
+                  }
                   <p>
                     <span className="font-medium">Address:</span>{" "}
                     {user?.streetAddress || "Home kerala 671322 ,"}

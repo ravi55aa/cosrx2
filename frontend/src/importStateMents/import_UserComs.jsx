@@ -13,6 +13,7 @@ const ReEnterPassword = lazy(()=>import("@/pages/user/Authentication/Login/ReEnt
 
 //*2-Menus
 const About = lazy(()=>import("@/pages/user/Menu/About/About.jsx")); 
+const Contact = lazy(()=>import("@/pages/user/Menu/ContactUs/Contact.jsx")); 
 const Profile = lazy(()=>import("@/pages/user/Menu/Profile/Profile.jsx"));
 const Homepage = lazy(()=>import("@/pages/user/Menu/HomePage/Homepage.jsx"));
 //Shop
@@ -39,11 +40,14 @@ const Address_Edit = lazy(()=>import("@/pages/user/Menu/Profile/Address/User.add
 
 //*4: 
 const CartPage = lazy(()=>import("@/pages/user/Menu/Cart/Cart.jsx"));
+const Wallet = lazy(()=>import("@/pages/user/Wallet/Wallet.jsx"));
 //*5: 
 const WishListPage = lazy(()=>import("@/pages/user/Menu/wishlist/wishlist.jsx"));
 //*6 
 const CheckOutPage = lazy(()=>import("@/pages/user/Orders/CheckoutPage.jsx"));
 const ThankingPage = lazy(()=>import("@/pages/user/Orders/ThankingPage.jsx"));
+const OrderFailure = lazy(()=>import("@/pages/user/Orders/OrderFailure.jsx"));
+
 const OrdersListing = lazy(()=>import("@/pages/user/Orders/OrdersListing.jsx"));
 const ParticularOrderDetails = lazy(()=>import("@/pages/user/Orders/ParticularOrderDetails.jsx"));
 const Invoice = lazy(()=>import("@/pages/user/Orders/Invoice.jsx"));
@@ -58,6 +62,7 @@ export default {
     UploadPicture,
     ReEnterPassword,
     About,
+    Contact,
     Profile,
     Homepage,
     ShopPage,
@@ -76,10 +81,12 @@ export default {
     Address_Add_OTP,
     Address_Edit,
 
+    Wallet,
     CartPage,
     WishListPage,
     CheckOutPage,
     ThankingPage,
+    OrderFailure,
     OrdersListing,
     ParticularOrderDetails,
     Invoice,

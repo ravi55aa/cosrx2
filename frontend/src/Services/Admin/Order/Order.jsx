@@ -72,6 +72,17 @@ export const admin_order_updateStatus=async(orderId,newStatus)=>{
     }
 };
 
+export const admin_order_item_updateStatus = async (orderId, itemId, newStatus) => {
+    try {
+        const response = await axiosBaseUrl.patch(`/adminOrd/orders/${orderId}/items/${itemId}/status`, { status: newStatus });
+        return response?.data?.success || false;
+    } catch (err) {
+        console.error("Error updating item status:", err.message);
+        toast.error(err?.response?.data?.message);
+        return false;
+    }
+};
+
 
 export const admin_searchSubmit_Service=async(searchTerm)=>{
     try{
@@ -92,7 +103,6 @@ export const admin_searchSubmit_Service=async(searchTerm)=>{
 
 export const admin_management_order_delivered_accept_service=async(orderId)=>{
     try{
-
         if(!orderId){
             return ;
         }
@@ -105,3 +115,4 @@ export const admin_management_order_delivered_accept_service=async(orderId)=>{
         return false;
     }
 }
+

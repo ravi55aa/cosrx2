@@ -17,6 +17,8 @@ import {toast} from "react-toastify";
 import axiosBaseUrl from "$/axios";
 import { useNavigate } from "react-router-dom";
 
+import Swal from "sweetalert2";
+
 const UsersPage = () => {
 
   const navigate =  useNavigate();
@@ -142,7 +144,19 @@ const UsersPage = () => {
   }, []);
 
   const handleUserBlock =  async (id, blockingValue,gleId) => {
-      if(blockingValue === false && !window.confirm("Sure to Delete")){
+      
+    const result = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Do you really want to block this user?.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: `Yes, ${!blockingValue ? "Block": "UnBlock"}!`,
+                    cancelButtonText: 'Cancel'
+              });
+
+      if(blockingValue && !result.isConfirmed){
         return false;
       }
 

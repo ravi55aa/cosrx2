@@ -35,10 +35,15 @@ const WalletSchema = new Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Order',  
                 default: null
+            },
+            transactId:{
+                type:String,
+                default:null,
+                required:true
             }
         }
     ]
-});
+},{timestamps:true});
 
 const Wallet = mongoose.model('Wallet', WalletSchema);
 

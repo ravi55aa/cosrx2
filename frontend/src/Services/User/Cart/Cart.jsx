@@ -14,7 +14,6 @@ export const getCartItems=async()=>{
         return response;
         
     } catch(err){
-        console.log(err);
         toast.error(err?.response?.data?.message || err?.message);
         return false;
     }

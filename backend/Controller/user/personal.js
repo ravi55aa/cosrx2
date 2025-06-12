@@ -4,9 +4,26 @@ const userModel =  require('../../Model/user');
 const mongoose =  require("mongoose");
 const addressModel = require("../../Model/address");
 const bcrypt = require("bcrypt");
+const walletModel=require("../../Model/wallet");
+
+const getObjToId=(id)=>{
+    return new mongoose.Types.ObjectId(id);
+}
+
+const checkWhichId=async(field,id)=>{
+    let userId = "";
+    
+    if(field == "googleId"){
+        const user = await userModel.findOne({[field]:id});
+        userId = user._id ;
+    } else {
+        userId = getObjToId(id);
+    }
+
+    return userId; 
+}  
 
 const fetchProfile = async(req,res)=>{
-
     try {
         const {id} =  req.query
 
@@ -40,7 +57,7 @@ const fetchProfile = async(req,res)=>{
         return;
 
     } catch(err){
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({mission:"failed",message:"server error",Error:err.message});
         return;
     }
@@ -49,7 +66,7 @@ const fetchProfile = async(req,res)=>{
 const profileEdit=async(req,res)=>{
     try {
         const {id} = req.params;
-        console.log("the user body is ",req.body)
+        
         
         if(!id){
             res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"Id not found"});
@@ -82,7 +99,7 @@ const profileEdit=async(req,res)=>{
         return;
 
     }catch(err){
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({mission:"failed",message:"Server Error",error:err.message});
         return;
     }
@@ -145,7 +162,7 @@ const handlePasswordChange=async(req,res)=>{
         res.status(HttpStatus.OK).json({mission:"success",message:"Passwords updated Successfully"});
         return true;
     }catch(err) {
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({mission:"failed",message:"Server Error",Error:err.message});
         return;
     }
@@ -155,7 +172,7 @@ const handleForgotPasswordOnEdit=async(req,res)=>{
     try{
         const {password1,password2} = req.body;
 
-        console.log("password :",password1);
+        
         const {query} = req.query; //key,value;
         let {field,id} = query;
 
@@ -180,7 +197,7 @@ const handleForgotPasswordOnEdit=async(req,res)=>{
         res.status(HttpStatus.OK).json({mission:"success",message:"User updated successfully"});
         return;
     } catch(err) {
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({mission:"failed",message:"Server Error",Error:err.message});
         return;
     }
@@ -189,25 +206,18 @@ const handleForgotPasswordOnEdit=async(req,res)=>{
 const handleNewAddAddress=async(req,res)=>{
     try {
         let {field,id} = req.query;
-        console.log(req.query);
-        
+
         if(!id){
             res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"id not found"});
             return;
         }
-        id = new mongoose.Types.ObjectId(id);
         
-        const user = await userModel.findOne({[field]:id});
-        
-        if(!user || Object?.keys(user)?.length <= 0 ){
-            res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"User not found"});
-            return;
-        }
+        const userId = await checkWhichId(field,id);
 
         const {name,state,phone,streetAddress,townCity,postcodeZip,alternativePhone} = req.body;
 
         //User in  the DB
-        const userInDB = await addressModel.findOne({userId:user._id});
+        const userInDB = await addressModel.findOne({userId:userId});
 
         let isPrimary = true;
         
@@ -226,11 +236,11 @@ const handleNewAddAddress=async(req,res)=>{
             "isPrimary" : isPrimary
         }
 
-        console.log("address",address);
+        
 
         if(userInDB && Object.keys(userInDB).length > 0){
             await addressModel.updateOne(
-                {userId:user._id},
+                {userId:userId},
                 {$push : {address:address}}
             );
             
@@ -239,7 +249,7 @@ const handleNewAddAddress=async(req,res)=>{
         }
         
         const newAddress = await new addressModel({
-            userId:user._id,
+            userId:userId,
             address:[address]
         }).save();
 
@@ -247,7 +257,7 @@ const handleNewAddAddress=async(req,res)=>{
         return;
 
     } catch(err){
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({mission:"failed",message:"Server Error",error:err.message});
         return;
     }
@@ -256,24 +266,32 @@ const handleNewAddAddress=async(req,res)=>{
 const handleGetAddress=async(req,res)=>{
     try {
         let {field,id} = req.query;
-    
+        
         if(!id){
             res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"id not found"});
             return;
         }
-        id = new mongoose.Types.ObjectId(id);
-
-        const user = await userModel.findOne({[field]:id});
         
-        if(!user || Object?.keys(user)?.length <= 0 ){
-            res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"User not found"});
-            return;
+        let userId = await checkWhichId(field,id);
+    
+        let addresses = await addressModel.findOne({userId:userId}).populate("userId");
+        
+        let walletAmt = await walletModel.findOne(
+            {userId:userId}
+        );
+
+        if(!walletAmt){
+            walletAmt = 'no money';
         }
     
-        const addresses = await addressModel.findOne({userId:user._id}).populate("userId");
-    
         res.status(HttpStatus.OK)
-            .json({mission:"success",message:"AddressFetchSuccessfully", address :addresses});
+            .json(
+                {
+                    mission:"success",
+                    message:"AddressFetchSuccessfully", 
+                    address :addresses,
+                    walletAmt:walletAmt.balance
+            });
         return;
 
     }catch(err){
@@ -294,7 +312,7 @@ const handleDeleteAddress=async(req,res)=>{
         }
     
         addressID = new mongoose.Types.ObjectId(addressID);
-        const addressToDelete = await addressModel.findOne({"address._id": addressID}); 
+        const addressToDelete = await addressModel.findOne({"address._id": addressID});
     
         if(!addressToDelete || Object?.keys(addressToDelete)?.length <= 0){
             res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"Address not found"});
@@ -303,13 +321,19 @@ const handleDeleteAddress=async(req,res)=>{
         
         addressToDelete.address  = addressToDelete.address.filter((addr => !addr._id.equals(addressID)));
 
+        const findPrimaryAddress = addressToDelete?.address.find((add)=>add.isPrimary)
+
+        if (!findPrimaryAddress && addressToDelete.address && addressToDelete.address[0]) {
+                addressToDelete.address[0].isPrimary = true;
+        }
+
         await addressToDelete.save();
-        
+
         res.status(HttpStatus.OK)
         .json({mission:"success",message:"Address Deleted Successfully",});
         return;
     } catch(err){
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .json({mission:"failed",message:"ServerError",Error :err.message});
         return;
@@ -324,9 +348,14 @@ const handleEditFetchAddress=async(req,res)=>{
             res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"AddressID not found"});
             return;
         }
+        
+        const {id,field} = req.query;
+        
+        let userId = await checkWhichId(field,id);
     
         addressID = new mongoose.Types.ObjectId(addressID);
-        const addressToEdit = await addressModel.findOne({"address._id": addressID}); 
+        const addressToEdit = await addressModel.findOne(
+            {userId: userId ,"address._id": addressID}); 
     
         if(!addressToEdit || Object?.keys(addressToEdit)?.length <= 0){
             res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"Address not found"});
@@ -339,7 +368,7 @@ const handleEditFetchAddress=async(req,res)=>{
         .json({mission:"success",message:"Address Edited Successfully",address:address});
         return;
     } catch(err){
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .json({mission:"failed",message:"ServerError",Error :err.message});
         return;
@@ -353,7 +382,6 @@ const handleEditAddress=async(req,res)=>{
             res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"AddressID not found"});
             return;
         }
-
         const {isPrimary} = req.body;
 
         addressID = new mongoose.Types.ObjectId(addressID);
@@ -363,9 +391,7 @@ const handleEditAddress=async(req,res)=>{
             res.status(HttpStatus.NOT_FOUND).json({mission:"failed",message:"Address not found"});
             return;
         }        
-
         addressToEdit.address = addressToEdit.address.map((addr) =>{
-
                 if(addr._id.equals(addressID)) {
                     return {
                         ...addr.toObject(),
@@ -384,7 +410,7 @@ const handleEditAddress=async(req,res)=>{
         return;
 
     } catch(err){
-        console.log(err.message);
+        
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .json({mission:"failed",message:"ServerError",Error :err.message});
     }
@@ -430,7 +456,7 @@ const handleChangingDefaultAddr=async(req,res)=>{
         return;
 
     } catch(err){
-        console.log(err.message);
+        
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .json({mission:"failed",message:"ServerError",Error :err.message});
     }
@@ -449,4 +475,6 @@ module.exports =  {
     handleEditFetchAddress,
     handleEditAddress,
     handleChangingDefaultAddr,
+
+    checkWhichId,
 };

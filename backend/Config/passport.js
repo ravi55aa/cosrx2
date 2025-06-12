@@ -13,7 +13,9 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       try {
 
-        // Create a JWT Token
+        // Create a JWT Token for 
+        // pass it for the authorization purpose.
+        //---------------------------------c
         const payload = { _id: profile.id ,email: profile.emails[0].value };
 
         const token = generateToken(payload); 

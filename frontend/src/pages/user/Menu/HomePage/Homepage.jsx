@@ -14,7 +14,7 @@ import {useSelector, useDispatch} from "react-redux";
 import axiosBaseUrl from "$/axios";
 import { loadData } from "#/Homepage/loadHomePage"; 
 
-// Dummy images for products
+
 const dummyProductImage = "https://via.placeholder.com/200x300?text=Product+Image";
 
 

@@ -33,7 +33,7 @@ const AddAddress = () => {
         pincode: "",
         phone: "",
         altPhone: "",
-        isPrimary:"",
+        isPrimary:false,
         _id:"",
     });
 
@@ -79,7 +79,7 @@ const AddAddress = () => {
     const handleSubmit = useCallback(async(e)=>{
         e.preventDefault();
 
-        const updatedAddress = {...addressData,townCity:addressData.city,postcodeZip:addressData?.pincode,alternativePhone:addressData.altPhone,isPrimary:addressData.isPrimary == "true" ? true : false};
+        const updatedAddress = {...addressData,townCity:addressData.city,postcodeZip:addressData?.pincode,alternativePhone:addressData.altPhone,isPrimary:addressData.isPrimary == true ? true : false};
 
         console.log("Submitting this address data:", updatedAddress);
 
@@ -158,7 +158,7 @@ const AddAddress = () => {
       <div className="flex md:flex-col !w-[90%]">
         {/* Mobile Menu Button */}
         <div className="md:hidden p-4 bg-teal-600 text-white flex !md:flex-col justify-between items-center">
-          <h2 className="text-xl font-bold">Add Address</h2>
+          <h2 className="text-xl font-bold">Edit Address</h2>
           <button type="button" onClick={() => setIsSidebarOpen(true)} className="text-white">
             <FaBars size={24} />
           </button>
@@ -167,7 +167,7 @@ const AddAddress = () => {
         {/* Address Form */}
         <div className="w-[60%] mx-auto px-4 py-8">
           <div className="bg-white rounded-lg shadow-md p-6" data-aos="fade-up">
-            <h1 className="text-3xl font-bold text-textLight mb-6">Add Address</h1>
+            <h1 className="text-3xl font-bold text-textLight mb-6">Edit Address</h1>
 
             <div className="grid grid-cols-1 gap-8">
               {/* Sidebar Placeholder on Desktop */}
@@ -290,7 +290,6 @@ const AddAddress = () => {
                       pincode: "",
                       phone: "",
                       alternativePhone: "",
-                      isPrimary:false
                     })
                     window.history.back();
                   }}

@@ -22,7 +22,7 @@ const App = () => {
 
   return (
     <div>
-      <ToastContainer theme="dark" />
+      <ToastContainer position='bottom-center' limit={5} theme="dark" />
       
       <Suspense fallback={<div className='bg-black h-[100vh] text-white flex justify-center items-center'>
         <BounceLoader
@@ -57,6 +57,26 @@ const App = () => {
         <Route path='/admin/orders/details/:orderId' 
           element={<AdminSession><import_AdminComps.Admin_OrderDetailsOfAOrder/></AdminSession>} />
 
+        <Route path='/admin/offer' 
+              element={<import_AdminComps.Admin_Offer/>} />
+        <Route path='/admin/offer/add' 
+              element={<import_AdminComps.Admin_Offer_Add/>} />
+        <Route path='/admin/offer/edit/:offerId' 
+              element={<import_AdminComps.Admin_Offer_Edit/>} />
+
+
+        <Route path='/admin/coupon' 
+            element={<import_AdminComps.Admin_Coupon/>} />
+        <Route path='/admin/coupon/add' 
+            element={<import_AdminComps.Admin_Coupon_Add/>} />
+        <Route path='/admin/coupon/edit/:couponId' 
+            element={<import_AdminComps.Admin_Coupon_Edit/>} />
+        
+        <Route path='/admin/sales' 
+            element={<import_AdminComps.Admin_SalesReport/>} />
+
+          
+
  {/* USER SIDE */}
         <Route element={<AuthenticationProtect/>}>
             <Route path='/user/register'  element={  <import_UserComs.Registration/> } />
@@ -72,7 +92,8 @@ const App = () => {
             <Route path='/user/homepage' element={ <import_UserComs.Homepage/>} />
             <Route path='/user/shop' element={<import_UserComs.ShopPage/>} />
             <Route path='/user/aboutUs' element={<import_UserComs.About/>} />
-            
+            <Route path='/user/contactUs' element={<import_UserComs.Contact/>} />
+
             <Route path='/user/productDetails/:productId' element={  <import_UserComs.ProductDetails/>  } />
             <Route path='/user/product/serum' element={<import_UserComs.Serum/>} />
             <Route path='/user/product/sunscreen' element={<import_UserComs.SunScreen/>} />
@@ -95,15 +116,20 @@ const App = () => {
 
         {/* CartPage*/}
         <Route path='/user/cart' element={<import_UserComs.CartPage/>} />
+
+        <Route path='/user/wallet' element= {<import_UserComs.Wallet/>} />
+
         <Route path='/user/wishlist' element={<import_UserComs.WishListPage/>} />
         <Route path='/user/checkout' element={<import_UserComs.CheckOutPage/>} />
         <Route path='/user/orderCompleted/:order_Id' element={<import_UserComs.ThankingPage/>} />
+        <Route path='/user/order/failed/:order_Id' element={<import_UserComs.OrderFailure/>} />
         <Route path='/user/list-of-order' element={<import_UserComs.OrdersListing/>} />
         <Route path='/user/order-details/:order_Id' element={<import_UserComs.ParticularOrderDetails/>} />
         <Route path='/user/order/invoice/:order_Id' element={<import_UserComs.Invoice/>} />
+
         </Route>
 
-        <Route path='*' element={<NOT_FOUND/>}/> 
+        <Route path='*' element={ <import_UserComs.Homepage/> }/> 
       </Routes>
       </Suspense>
     </div>  

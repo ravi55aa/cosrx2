@@ -1,21 +1,17 @@
-import { useState,useEffect,useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
 import AOS from "aos";
 import "aos/dist/aos.css";
-import axios from "axios";
 import { gsap } from "gsap";
 import { motion } from "framer-motion";
-import {toast} from "react-toastify"
-
-import {LuEye, LuEyeClosed} from "react-icons/lu"
-
-import registraion from "@/assets/cosrx.png"
+import { toast } from "react-toastify";
+import { LuEye, LuEyeClosed } from "react-icons/lu";
+import registraion from "@/assets/cosrx.png";
 import axiosBaseUrl from "$/axios";
 
 const Register = () => {
   const navigate = useNavigate();
-  
+
   // Initialize AOS and GSAP animations
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
@@ -33,124 +29,135 @@ const Register = () => {
     );
   }, []);
 
-  let [formData,setUserData] = useState({
-    firstName:"",
-    lastName:"",
-    email:"",
-    password:"",
+  const [formData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    referralCode: "" 
   });
 
-   let [seePassword,setSeePassword] = useState(false);
+  const [seePassword, setSeePassword] = useState(false);
+  const [errors, setErrors] = useState({}); 
 
-
-  const handleChange=(e)=>{
-    if(!e.target.name) {
-      console.log("no name present");
+  const handleChange = (e) => {
+    if (!e.target.name) {
+      console.log("No name present");
       return;
     }
 
-    setUserData((prevData)=>({
-      ...prevData, [e.target.name] : e.target.value
-    }))
+    setUserData((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value
+    }));
 
-    return;
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [e.target.name]: ""
+    }));
   };
 
-  const handleEachFileds=()=>{
-    const {email,firstName,password,lastName} = formData;
-
+  const handleEachFileds = () => {
+    const { email, firstName, password, lastName, referralCode } = formData;
     let errors = {};
 
-    
     if (!firstName.trim()) {
-        errors.firstName = 'First name is required';
+      errors.firstName = "First name is required";
     } else if (firstName.length < 3 || firstName.length > 50) {
-        errors.firstName = 'First name must be 3-50 characters.';
-    }else if (!/[a-zA-Z]/.test(firstName)){
-        errors.firstName = 'First name must contain at least one Upper-letter and One LowerCase-letter';
+      errors.firstName = "First name must be 3-50 characters";
+    } else if (!/[a-zA-Z]/.test(firstName)) {
+      errors.firstName = "First name must contain at least one letter";
     }
 
     if (!lastName.trim()) {
-        errors.lastName = 'Last Name is required';
+      errors.lastName = "Last name is required";
     } else if (lastName.length < 3 || lastName.length > 50) {
-        errors.lastName = 'Last Name  must be 3-50 characters.';
-    }else if (!/[a-zA-Z]/.test(lastName)){
-        errors.lastName = 'Last Name must contain at least one Upper-letter and One LowerCase-letter';
+      errors.lastName = "Last name must be 3-50 characters";
+    } else if (!/[a-zA-Z]/.test(lastName)) {
+      errors.lastName = "Last name must contain at least one letter";
     }
 
     if (!email.trim()) {
-      errors.email = 'Email is required';
-  } else if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email)) {
-      errors.email = 'Invalid Gmail address. Must end with @gmail.com';
-  } else if (email.length < 6 || email.length > 50) {
-      errors.email = 'Email must be between 6 and 50 characters.';
-  } else if (!/^[a-zA-Z0-9]/.test(email)) {
-      errors.email = 'Email must start with a letter or number.';
-  } else if (/\s/.test(email)) {
-      errors.email = 'Email cannot contain spaces.';
-  }
+      errors.email = "Email is required";
+    } else if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email)) {
+      errors.email = "Invalid Gmail address. Must end with @gmail.com";
+    } else if (email.length < 6 || email.length > 50) {
+      errors.email = "Email must be between 6 and 50 characters";
+    } else if (!/^[a-zA-Z0-9]/.test(email)) {
+      errors.email = "Email must start with a letter or number";
+    } else if (/\s/.test(email)) {
+      errors.email = "Email cannot contain spaces";
+    }
 
-  if (!password.trim()) {
-    errors.password = 'Password is required';
-} else if (password.length < 8 || password.length > 20) {
-    errors.password = 'Password must be 8-20 characters long.';
-} else if (!/[A-Z]/.test(password)) {
-    errors.password = 'Password must contain at least one uppercase letter.';
-} else if (!/[a-z]/.test(password)) {
-    errors.password = 'Password must contain at least one lowercase letter.';
-} else if (!/[0-9]/.test(password)) {
-    errors.password = 'Password must contain at least one number.';
-} else if (!/[@$!%*?&]/.test(password)) {
-    errors.password = 'Password must contain at least one special character (@$!%*?&)';
-} else if (/\s/.test(password)) {
-    errors.password = 'Password cannot contain spaces.';
-}
+    if (!password.trim()) {
+      errors.password = "Password is required";
+    } else if (password.length < 8 || password.length > 20) {
+      errors.password = "Password must be 8-20 characters long";
+    } else if (!/[A-Z]/.test(password)) {
+      errors.password = "Password must contain at least one uppercase letter";
+    } else if (!/[a-z]/.test(password)) {
+      errors.password = "Password must contain at least one lowercase letter";
+    } else if (!/[0-9]/.test(password)) {
+      errors.password = "Password must contain at least one number";
+    } else if (!/[@$!%*?&]/.test(password)) {
+      errors.password = "Password must contain at least one special character (@$!%*?&)";
+    } else if (/\s/.test(password)) {
+      errors.password = "Password cannot contain spaces";
+    }
+
+    if (referralCode.trim()) {
+      if (referralCode.length < 6 || referralCode.length > 20) {
+        errors.referralCode = "Referral code must be 6-20 characters";
+      } else if (!/^[a-zA-Z0-9]+$/.test(referralCode)) {
+        errors.referralCode = "Referral code must be alphanumeric (letters and numbers only)";
+      } else if (/\s/.test(referralCode)) {
+        errors.referralCode = "Referral code cannot contain spaces";
+      }
+    }
 
     return errors;
-  }
-
-  const handleSubmit=useCallback((e)=>{
-    
-    e.preventDefault();
-
-    let formValidation = handleEachFileds();
-
-    if(Object.keys(formValidation).length > 0){
-      
-      toast(Object.entries(formValidation)[0][1]);
-      return;
-    }
-
-    axiosBaseUrl.post("/user/register",formData)
-    .then((res)=>{
-      const result = res.data;
-      // localStorage.setItem("token",JSON.stringify(result.token));
-
-      navigate("/user/otp",{state:{token : result.token ,userId:result.userId}});
-
-    }).catch((err)=>{ 
-      toast.info(err.response?.data?.message);
-      return;
-    })
-  },[formData]);
-
-
-  const handleGoogleLogin = () => {
-      window.location.href = "http://localhost:4000/auth/google"; 
-  }
-
-  const handlePasswordWatch=()=>{
-    if(!formData.password?.trim()){
-      toast.info("Field is null");
-      return;
-    }
-
-    setSeePassword((prevState)=>!prevState);
   };
 
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      const formValidation = handleEachFileds();
+
+      if (Object.keys(formValidation).length > 0) {
+        setErrors(formValidation);
+        toast.error(Object.entries(formValidation)[0][1]);
+        return;
+      }
+
+      axiosBaseUrl
+        .post("/user/register", formData)
+        .then((res) => {
+          const result = res.data;
+          navigate("/user/otp", { state: { token: result.token, userId: result.userId } });
+          toast.success("Registration successful! Verify your OTP.");
+        })
+        .catch((err) => {
+          toast.error(err.response?.data?.message || "Registration failed.");
+        });
+    },
+    [formData]
+  );
+
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:4000/auth/google";
+  };
+
+  const handlePasswordWatch = () => {
+    if (!formData.password?.trim()) {
+      toast.info("Password field is empty");
+      return;
+    }
+    setSeePassword((prevState) => !prevState);
+  };
 
   return (
-    <div className=" h-[100vh] overflow-hidden flex flex-col lg:flex-row bg-gray-50">
+    <div className="h-[100vh] overflow-y-scroll overflow-x-hidden flex flex-col lg:flex-row bg-gray-50">
       {/* Left Section: Form */}
       <motion.div
         className="lg:w-1/2 w-full flex items-center justify-center p-8"
@@ -166,71 +173,101 @@ const Register = () => {
             Get Started Now
           </h1>
 
-          <form onSubmit={(e)=>handleSubmit(e)} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div data-aos="fade-up" data-aos-delay="100">
               <label className="block text-sm font-medium text-textLight">
-                Firstname
+                First Name
               </label>
               <input
                 type="text"
                 name="firstName"
-                onChange={(e)=>handleChange(e)}
-                placeholder="Enter your name"
-                className="w-full mt-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white border-gray-300"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Enter your first name"
+                className={`w-full mt-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
               />
+              {errors.firstName && (
+                <p className="text-sm text-red-600 mt-1">{errors.firstName}</p>
+              )}
             </div>
-            <div data-aos="fade-up" data-aos-delay="100">
+            <div data-aos="fade-up" data-aos-delay="150">
               <label className="block text-sm font-medium text-textLight">
-                Lastname
+                Last Name
               </label>
               <input
                 type="text"
                 name="lastName"
-                onChange={(e)=>handleChange(e)}
-                placeholder="Enter your name"
-                className="w-full mt-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white border-gray-300"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Enter your last name"
+                className={`w-full mt-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
               />
+              {errors.lastName && (
+                <p className="text-sm text-red-600 mt-1">{errors.lastName}</p>
+              )}
             </div>
             <div data-aos="fade-up" data-aos-delay="200">
               <label className="block text-sm font-medium text-textLight">
-                Email address
+                Email Address
               </label>
               <input
                 type="email"
                 name="email"
-                onChange={(e)=>handleChange(e)}
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Enter your email"
-                className="w-full mt-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white border-gray-300"
+                className={`w-full mt-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
               />
+              {errors.email && (
+                <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+              )}
             </div>
-
-            <div data-aos="fade-up" data-aos-delay="300">
+            <div data-aos="fade-up" data-aos-delay="250">
               <label className="block text-sm font-medium text-textLight">
                 Password
               </label>
-              <div className="flex align-center justify-between">
-                  <input
-                    
-                    type={`${seePassword ? "text" : "password" }`}
-                    name="password"
-                    onChange={(e)=>handleChange(e)}
-                    placeholder="Enter your password"
-                    className="relative w-full mt-1 py-3 pl-3 pr-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white border-gray-300"
-                  />
-                  { seePassword ?
-                  (<LuEye onClick={handlePasswordWatch} className="absolute !opacity-60 top-[55%] right-2" />)
-
-                  :(<LuEyeClosed onClick={handlePasswordWatch} className="absolute !opacity-60 top-[55%] right-2" />)
-                  }
-
+              <div className="relative">
+                <input
+                  type={seePassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className={`w-full mt-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                />
+                {formData.password && (
+                  seePassword ? (
+                    <LuEye
+                      onClick={handlePasswordWatch}
+                      className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer opacity-60"
+                    />
+                  ) : (
+                    <LuEyeClosed
+                      onClick={handlePasswordWatch}
+                      className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer opacity-60"
+                    />
+                  )
+                )}
               </div>
+              {errors.password && (
+                <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+              )}
             </div>
-
-            <div
-              className="flex items-center space-x-2"
-              data-aos="fade-up"
-              data-aos-delay="400"
-            >
+            <div data-aos="fade-up" data-aos-delay="300">
+              <label className="block text-sm font-medium text-textLight">
+                Referral Code (Optional)
+              </label>
+              <input
+                type="text"
+                name="referralCode"
+                value={formData.referralCode}
+                onChange={handleChange}
+                placeholder="Enter referral code (optional)"
+                className={`w-full mt-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-textLight bg-white ${errors.referralCode ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {errors.referralCode && (
+                <p className="text-sm text-red-600 mt-1">{errors.referralCode}</p>
+              )}
             </div>
 
             <motion.button
@@ -239,18 +276,16 @@ const Register = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               data-aos="fade-up"
-              data-aos-delay="500"
+              data-aos-delay="350"
             >
               Sign Up
             </motion.button>
           </form>
 
-         
-
           <div
             className="flex items-center justify-center space-x-"
             data-aos="fade-up"
-            data-aos-delay="600"
+            data-aos-delay="400"
           >
             <motion.button
               className="w-full py-3 border rounded-md flex items-center justify-center space-x-2 text-textLight hover:bg-gray-100 transition-colors"
@@ -263,18 +298,13 @@ const Register = () => {
                 alt="Google"
                 className="w-5 h-5"
               />
-              <span >sign up with google</span>
+              <span>Sign up with Google</span>
             </motion.button>
           </div>
 
           <p
-          className=" w-[50%] mx-auto text-center 
-          underline cursor-pointer
-          text-green-800 hover:text-green-500" 
-          
-          onClick={()=>{
-            navigate("/user/login")
-          }} 
+            className="w-[50%] mx-auto text-center underline cursor-pointer text-green-800 hover:text-green-500"
+            onClick={() => navigate("/user/login")}
           >
             Already Have an Account
           </p>
@@ -282,7 +312,7 @@ const Register = () => {
       </motion.div>
 
       {/* Right Section: Image */}
-      <div className="lg:w-1/2 lg:block shadow-2xl hidden lg:h-auto">
+      <div className="lg:w-1/2 lg:block hidden lg:h-auto">
         <img
           src={registraion}
           alt="Placeholder"

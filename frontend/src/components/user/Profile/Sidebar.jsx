@@ -25,8 +25,10 @@ const Sidebar = () => {
                     Orders
                     </Link>
                     </li>
-                    <li className={liClassed} >Wallet</li>
-                    <li className={liClassed} >Coupons</li>
+                    <Link to="/user/wallet">
+                      <li  className={liClassed} >Wallet</li>
+                    </Link>
+                    
                 </ul>
     </div>
     )

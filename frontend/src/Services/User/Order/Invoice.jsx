@@ -4,7 +4,7 @@ import {getUserId} from "../../Reusable";
 
 export const getInvoiceOfOrder=async(order_Id)=>{
     try{
-        const response = await axiosBaseUrl.get(`/order/invoice/${order_Id}`);
+        const response = await axiosBaseUrl.get(`/order/invoice/${order_Id}`,{params:getUserId()});
 
         return response;
         

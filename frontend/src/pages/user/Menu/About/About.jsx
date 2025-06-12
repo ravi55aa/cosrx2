@@ -11,7 +11,7 @@ import cosrxLogo from "@/assets/logo.png";
 import testimonialImage from "@/assets/aboutUs/profile.jpeg"; 
 
 const AboutUs = () => {
-  // Initialize AOS animations
+  
   React.useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
@@ -23,7 +23,7 @@ const AboutUs = () => {
       {/* Hero Section */}
       <section
         className="relative bg-cover bg-center py-32"
-        style={{ backgroundImage: `url(${headerBackground})` }} // Replace with your image
+        style={{ backgroundImage: `url(${headerBackground})` }} 
       >
         <div className="absolute  opacity-80"></div>
         <div className="relative max-w-7xl mx-auto px-4 text-center">

@@ -128,7 +128,10 @@ const EnterOTP = () => {
             clearInterval(intervalRef.current);
           }
 
-          const token = JSON.parse(window.localStorage.getItem("token"));
+          // const token = JSON.parse(window.localStorage.getItem("token"));
+
+          console.log("the location si",location);
+          const token = location?.state?.token;
 
           if(!token) {
             toast.info("Technical issue,kindly Register once-again")
@@ -215,7 +218,7 @@ const EnterOTP = () => {
           data-aos-delay="300"
         >
           Wrong Email?{" "}
-          <a onClick={()=>navigate("/login")} className="text-teal-500 hover:underline">
+          <a onClick={()=>navigate("/login")} className="text-teal-500 hover:cursor-pointer hover:underline">
             Renter
           </a>
         </p>

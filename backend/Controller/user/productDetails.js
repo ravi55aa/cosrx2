@@ -1,7 +1,14 @@
 const HttpStatus = require("../../Config/HTTPstatusCodes");
 const productModel = require("../../Model/product");
 const categoryModel = require("../../Model/category");
+const offerModel = require("../../Model/offer");
+const couponModel = require("../../Model/coupon");
+
 const mongoose = require("mongoose");
+
+const getObjOfId =(id)=>{
+  return new mongoose.Types.ObjectId(id)
+}
 
 // listing=true  isDelete=false
 const loadCategory=async(req,res)=>{
@@ -24,10 +31,10 @@ const productDetails = async (req, res) => {
     const { id } = req.params;
 
     if (!id) {
-      res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ mission: "failed", message: "Id not found" });
-      return;
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        mission: "failed",
+        message: "Product ID is required"
+      });
     }
 
     const productObjectId = new mongoose.Types.ObjectId(id);
@@ -35,41 +42,84 @@ const productDetails = async (req, res) => {
     const product = await productModel.findOne({ _id: productObjectId });
 
     if (!product) {
-      res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ mission: "failed", message: "product not found" });
-      return;
+      return res.status(HttpStatus.NOT_FOUND).json({
+        mission: "failed",
+        message: "Product not found"
+      });
     }
 
-    const availableProducts = ['available','out of stock']; 
+    const availableProducts = ['available', 'out of stock'];
     const related_Products = await productModel.find({
       isBlocked: false,
       category: product.category,
-      status : {$in : availableProducts},
-      _id:{$ne:productObjectId}
-    });//undefined
+      status: { $in: availableProducts },
+      _id: { $ne: productObjectId }
+    });
 
-    //if no related products
-    // Then show related products with the
-    // skin/product types
+    //----------------------------------
+    //will check the offer if hardCode offer
+    //if available
+    const finalOffer = await getBestOfTheProduct(id);
+    //----------------------
 
-    res
-      .status(HttpStatus.OK)
-      .json({
-        mission: "success",
-        message: "product fetch successful",
-        product: product,
-        relatedProducts:related_Products
-      });
+    return res.status(HttpStatus.OK).json({
+      mission: "success",
+      message: "Product fetch successful",
+      product,
+      relatedProducts: related_Products,
+      finalOffer,
+    });
 
-    return;
   } catch (err) {
-    res
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ mission: "failed", message: "server error", Error: err.message });
-    return;
+    
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      mission: "failed",
+      message: "Server error",
+      error: err.message
+    });
   }
 };
+
+const getBestOfTheProduct = async (id) => {
+  const now = new Date();
+
+  const product = await productModel.findOne({ _id: getObjOfId(id) });
+
+  const offersOnProduct = await offerModel.find({
+    applicableTo: getObjOfId(id),
+    validFrom: { $lte: now },
+    validUpto: { $gte: now },
+    discountType: "Percentage"
+  });
+
+  const offersOnCategory = await offerModel.find({
+    applicableTo: product.category,
+    validFrom: { $lte: now },
+    validUpto: { $gte: now },
+    discountType: "Percentage"
+  });
+    
+  const validProdOffers = offersOnProduct.filter(o => o.discountAmount <= 25);
+  const validCatOffers = offersOnCategory.filter(o => o.discountAmount <= 25);
+
+  // Sort descending and pick the best one (highest discount under 25%)
+  const bestProdOffer = validProdOffers.sort((a, b) => b.discountAmount - a.discountAmount)[0] || null;
+  const bestCatOffer = validCatOffers.sort((a, b) => b.discountAmount - a.discountAmount)[0] || null;
+
+  // Calculate offer values
+  const prodValue = bestProdOffer ? (bestProdOffer.discountAmount / 100) * product.salePrice : 0;
+  const catValue = bestCatOffer ? (bestCatOffer.discountAmount / 100) * product.salePrice : 0;
+
+  // Return the better of the two
+  if (prodValue >= catValue && bestProdOffer) {
+    return bestProdOffer;
+  } else if (bestCatOffer) {
+    return bestCatOffer;
+  } else {
+    return null; // No valid offer under 25%
+  }
+};
+  
 
 const getAllProductIntoShop = async (req, res) => {
   try {
@@ -109,7 +159,7 @@ const getAllProductIntoShop = async (req, res) => {
     });
 
   } catch (err) {
-    console.log("Error:", err.message);
+    
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       mission: "failed",
       message: "Server error",
@@ -215,7 +265,7 @@ const getFilteredProducts = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error fetching products:", error);
+    
     res.status(500).json({
       mission: "failed",
       message: "An error occurred while fetching products",
@@ -262,7 +312,7 @@ const getCategoryProducts = async (req, res) => {
       .json({ mission: "success", message: "dataFEtched", products: products });
     return;
   } catch (err) {
-    console.log(err.message);
+    
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ mission: "failed", message: "server error", error: err.message });
@@ -319,7 +369,7 @@ const getCategoryProductsBasedOnSearch=async(req,res)=>{
       return;
 
   } catch(err){
-      console.log(err.message);
+      
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ mission: "failed", message: "server error", error: err.message });
@@ -368,4 +418,5 @@ module.exports = {
   getCategoryProducts,
   getAllProductIntoShop,
   getCategoryProductsBasedOnSearch,
+  getBestOfTheProduct,
 };
