@@ -21,7 +21,7 @@ import {
     admin_editOffer_success,
     admin_fetchCategory_success,
     admin_fetchProducts_success
-} from "@/Services/Admin/offer/offer"
+} from "@/Services/Admin/Offer/Offer.jsx"
 
 import {
     validate_fields_edit_business
