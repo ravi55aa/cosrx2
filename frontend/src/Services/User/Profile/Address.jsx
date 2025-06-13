@@ -1,5 +1,6 @@
 import axiosBaseUrl from "$/axios";
 import {toast} from "react-toastify";
+import {getUserId} from "../../Reusable";
 
 export const deleteAddress=async(id)=>{
     try{
@@ -13,7 +14,8 @@ export const deleteAddress=async(id)=>{
 
 export const fetchEditAddress=async(id)=>{
     try{
-        const res = await axiosBaseUrl.get(`/profile/address/edit/fetchData/${id}`); //id==addressID
+        const res = await 
+        axiosBaseUrl.get(`/profile/address/edit/fetchData/${id}`,{params : getUserId()});
         return res;
     }catch(err){
         console.log(err.message);

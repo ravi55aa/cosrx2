@@ -12,9 +12,12 @@ import {
   TicketIcon,
   CogIcon,
   ArrowLeftOnRectangleIcon,
-  CubeIcon
+  CubeIcon,
+  DocumentArrowUpIcon,
 } from "@heroicons/react/24/outline";
 
+import { BiSolidOffer } from "react-icons/bi";
+import { PiFlagBannerFill } from "react-icons/pi";
 
 
 const Sidebar = () => {
@@ -49,14 +52,13 @@ const Sidebar = () => {
         {icon:UserIcon,title:"Users",path:"/admin/usersManage"},
         {icon:TagIcon,title:"Categories",path:"/admin/category"},
         {icon:CubeIcon,title:"Orders",path:"/admin/orders"},
-        {icon:TicketIcon,title:"Offers",path:""},
-        {icon:TicketIcon,title:"Banner",path:""},
-        {icon:TicketIcon,title:"coupons",path:""},
-        {icon:CogIcon,title:"Settings",path:""},
+        {icon:DocumentArrowUpIcon,title:"Sale Report",path:"/admin/sales"},
+        {icon:BiSolidOffer,title:"Offers",path:"/admin/offer"},
+        {icon:TicketIcon,title:"coupons",path:"/admin/coupon"},
     ];
 
     return (
-        <div>
+        <div className="">
         <motion.div
             className={`fixed h-screen inset-y-0 left-0 w-64 bg-gray-800 p-6 z-20 md:static md:w-64 ${
             isSidebarOpen ? "block" : " md:block"

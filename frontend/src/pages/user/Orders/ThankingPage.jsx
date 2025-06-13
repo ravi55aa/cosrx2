@@ -1,97 +1,118 @@
-import { useEffect, useState ,useRef} from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useLocation, Link, useNavigate, useParams } from "react-router-dom";
-import { getCartItems,fetchAddressActive_Service} from "@/Services/User/Cart/Cart.jsx"
-import { toast } from "react-toastify";
-import Invoice from "./Invoice";
+import { 
+  getCartItems, fetchAddressActive_Service 
+} from "@/Services/User/Cart/Cart.jsx";
 
-const demoCartItems = [
-  {
-    _id: "1",
-    productName: "COSRX Low pH Good Morning Gel Cleanser",
-    salePrice: 850,
-    quantity: 2,
-    productImage: "12",
-  },
-  {
-    _id: "2",
-    productName: "COSRX Advanced Snail 96 Mucin Power Essence",
-    salePrice: 1450,
-    quantity: 1,
-    productImage: "12",
-  },
-  {
-    _id: "3",
-    productName: "COSRX Oil-Free Ultra-Moisturizing Lotion",
-    salePrice: 1200,
-    quantity: 3,
-    productImage: "12",
-  },
-];
+import { 
+  user_fetch_orderIntoThankingPage_success
+} from "@/Services/User/Order/Order.jsx"
+
+import { toast } from "react-toastify";
+import axiosBaseUrl from "$/axios";
+import Invoice from "./Invoice";
 
 const ThankYou = () => {
   const location = useLocation();
-  const navigate =  useNavigate();
-  const {order_Id} = useParams()
-  const [cartItems,setCartItems] = useState([]);
-  const [address,setAddress] = useState({});
+  const navigate = useNavigate();
+  const { order_Id } = useParams();
+  const [cartItems, setCartItems] = useState({ items: [] });
+  const [address, setAddress] = useState({});
   const invoiceElement = useRef(null);
+  const [offerOfProducts, setOffersOfProduct] = useState([]);
+  const [orderDetails, setOrderDetails] = useState(null);
 
+  const fetchCartItems = async () => {
+    const response = await getCartItems();
+    if (!response) {
+      return false;
+    }
+    setCartItems(response?.data?.cartData || { items: [] });
+    setOffersOfProduct(response?.data?.offersOfProducts || []);
+    return true;
+  };
 
-    const fetchCartItems = async()=> {
-      const response = await getCartItems();
-      console.log(response);
-      
-      if(!response){
+  const fetchOrderDetails = async () => {
+
+      const response = await user_fetch_orderIntoThankingPage_success(order_Id);
+
+      if (!response) {
+        toast.error("Failed to fetch order details");
         return false;
       }
-  
-        setCartItems(response?.data?.cartData);
-        console.log("cartItems",response?.data?.cartData);
-        return true;
+      setOrderDetails(response.data?.order);
+      return true;
+  };
+
+  useEffect(() => {
+    fetchCartItems();
+    fetchOrderDetails();
+  }, []);
+
+  useEffect(() => {
+    const fetchActiveAddress = async () => {
+      const response = await fetchAddressActive_Service();
+      if (!response) {
+        return;
+      }
+      setAddress(response?.data?.address || {});
+    };
+    fetchActiveAddress();
+  }, []);
+
+  const paymentMethod = orderDetails?.paymentMethod || "Cash on Delivery";
+
+  const calculateSummary = () => {
+  let originalTotal = 0;
+  let finalTotal = 0;
+
+  cartItems?.items?.forEach((item) => {
+    const quantity = item?.quantity || 1;
+    const product = item?.productId;
+
+    const offerOfProduct = offerOfProducts.find(
+      (offer) =>
+        offer.applicableTo === product._id ||
+        offer.applicableTo === product.category
+    );
+
+    const originalPrice = product?.salePrice;
+    let basePrice = originalPrice;
+
+    if (offerOfProduct) {
+      basePrice =
+        offerOfProduct.discountType === "Percentage"
+          ? originalPrice - (offerOfProduct.discountAmount / 100) * originalPrice
+          : originalPrice - offerOfProduct.discountAmount;
     }
-  
-    useEffect(()=>{
-      fetchCartItems();
-    },[]);
 
-    useEffect(()=>{
-        const fetchActiveAddress=async()=>{
-          const response = await fetchAddressActive_Service();
-          
-          if(!response){
-            return;
-          }
-          
-          setAddress(response?.data?.address);
-          return true;
-        }
-    
-        fetchActiveAddress();
-    },[]);
+    originalTotal += originalPrice * quantity;
+    finalTotal += Math.floor(basePrice) * quantity;
+  });
 
-  const paymentMethod = "Cash on Delivery"; 
-  const shipping = 50.0; 
-  const savings = 150.0; 
+  return {
+    originalTotal,
+    finalTotal,
+    discount: originalTotal - finalTotal,
+  };
+};
+
+
+  const { originalTotal, finalTotal, discount } = calculateSummary();
+  const shipping = finalTotal >= 500 ? 0 : 40;
+  const fees = 3;
+  const couponDiscount = orderDetails?.couponDiscount || 0;
+  const grandTotal = (finalTotal + shipping + fees - couponDiscount).toFixed(2);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
 
-  const calculateSubtotal = () => {
-    return demoCartItems
-      .reduce((total, item) => total + item.salePrice * item.quantity, 0)
-      .toFixed(2);
-  };
-
-  const grandTotal = (parseFloat(calculateSubtotal()) + shipping - savings).toFixed(2);
-
-
   return (
     <div className="bg-gray-50">
-
       {/* Thank You Section */}
       <section className="py-16 bg-green-200">
         <div className="max-w-4xl mx-auto px-4">
@@ -134,32 +155,59 @@ const ThankYou = () => {
               Order Details
             </h3>
             <div className="space-y-4">
-              {cartItems.items?.map((item, index) => (
-                <motion.div
-                  key={item._id}
-                  className="flex items-center border-b pb-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <img
-                    src={item?.productId.productImage[0]}
-                    alt={item?.productId.productName}
-                    className="w-16 h-16 object-contain mr-4"
-                  />
-                  <div className="flex-1">
-                    <p className="text-gray-800 font-semibold">
-                      {item?.productId.productName.length > 35
-                        ? `${item?.productId.productName.slice(0, 35)}...`
-                        : item?.productId.productName}
-                    </p>
-                    <p className="text-gray-600 text-sm">Qty: {item.quantity}</p>
-                    <p className="text-teal-600 text-sm">
-                      ₹{(item?.productId.salePrice * item?.quantity).toFixed(2)}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+              {cartItems.items?.map((item, index) => {
+                const product = item.productId;
+                const offer = offerOfProducts.find(
+                  (ele) =>
+                    ele.applicableTo == product._id ||
+                    ele.applicableTo == product.category
+                );
+                let finalPrice = product.salePrice;
+                let originalPrice = product.salePrice;
+
+                if (offer) {
+                  finalPrice =
+                    offer.discountType === "Percentage"
+                      ? product.salePrice - (offer.discountAmount / 100) * product.salePrice
+                      : product.salePrice - offer.discountAmount;
+                  originalPrice = product.salePrice;
+                }
+
+                return (
+                  <motion.div
+                    key={item._id}
+                    className="flex items-center border-b pb-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <img
+                      src={item?.productId.productImage[0]}
+                      alt={item?.productId.productName}
+                      className="w-16 h-16 object-contain mr-4"
+                    />
+                    <div className="flex-1">
+                      <p className="text-gray-800 font-semibold">
+                        {item?.productId.productName.length > 35
+                          ? `${item?.productId.productName.slice(0, 35)}...`
+                          : item?.productId.productName}
+                      </p>
+                      <p className="text-gray-600 text-sm">Qty: {item.quantity}</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-teal-900 text-sm">
+                          {(Math.floor(finalPrice) + " X " + item.quantity) + "= "}
+                          ₹{(Math.floor(finalPrice) * item.quantity).toFixed(2)}
+                        </span>
+                        {offer && (
+                          <span className="text-teal-600 text-sm">
+                            (Saved ₹{(originalPrice - Math.floor(finalPrice)) * item.quantity}.00)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
 
             {/* Shipping Address */}
@@ -189,24 +237,32 @@ const ThankYou = () => {
               <h4 className="text-md font-semibold text-gray-800 mb-2">
                 Order Summary
               </h4>
-              <div className=" pt-4 space-y-2">
+              <div className="pt-4 space-y-2">
                 <div className="flex justify-between text-gray-800">
-                  <span>Subtotal</span>
-                  <span>₹{cartItems?.cartTotal}</span>
+                  <span>Subtotal ({cartItems?.items?.length} items)</span>
+                  <span>₹{originalTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-teal-600">
-                  <span>Savings</span>
-                  <span>₹{0}</span>
+                  <span>Product Discounts</span>
+                  <span>-₹{discount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-teal-600">
+                  <span>Coupon Discount</span>
+                  <span>-₹{couponDiscount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-teal-600">
+                  <span>Platform Fee</span>
+                  <span>₹{fees}</span>
                 </div>
                 <div className="flex justify-between text-gray-800">
                   <span>Shipping</span>
-                  <span className={cartItems?.cartTotal >= 500 ? "text-green-500" : "text-gray-700"}>
-                    {cartItems?.cartTotal >= 500 ?  `₹40` : "Free"} 
+                  <span className={finalTotal >= 500 ? "text-green-700" : "text-gray-500"}>
+                    {finalTotal >= 500 ? "Free" : `₹${shipping}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-800 font-semibold text-lg border-t pt-2">
                   <span>Grand Total</span>
-                  <span>₹{ cartItems?.cartTotal + ( cartItems?.cartTotal >= 500 ? 43 : 3) }  </span>
+                  <span>₹{grandTotal}</span>
                 </div>
               </div>
             </div>
@@ -222,7 +278,7 @@ const ThankYou = () => {
               className="py-2 px-4 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={()=>navigate(`/user/order/invoice/${order_Id}`)}
+              onClick={() => navigate(`/user/order/invoice/${order_Id}`)}
             >
               See Invoice
             </motion.button>
@@ -247,12 +303,10 @@ const ThankYou = () => {
           </div>
         </div>
 
-        <div className=" hidden opacity-0">
-        <Invoice ref={invoiceElement}/>
+        <div className="hidden opacity-0">
+          <Invoice ref={invoiceElement} />
         </div>
-
       </section>
-
     </div>
   );
 };

@@ -4,6 +4,7 @@ import {
   TrashIcon,
   Bars3Icon,
 } from "@heroicons/react/24/outline";
+import Swal from "sweetalert2"
 import ReactPaginate from "react-paginate";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
@@ -87,13 +88,23 @@ const ProductPage = () => {
     navigate(`/admin/products/edit/${product._id}`, { state: { product } });
   };
 
-  const handleSoftDelete = useCallback((id) => {
+  const handleSoftDelete = useCallback(async(id) => {
     if (!id) {
       toast.info("ID is null");
       return;
     }
 
-    if (!window.confirm("Are you sure you want to delete this item?")) {
+    const sureToDel = await Swal.fire({
+      title: "Sure to Delete",
+      icon: "question",
+      iconHtml: "؟",
+      confirmButtonText: "Remove",
+      cancelButtonText: "Not",
+      showCancelButton: true,
+      showCloseButton: true
+    });
+
+    if(!sureToDel.isConfirmed) {
       return;
     }
 
@@ -116,7 +127,18 @@ const ProductPage = () => {
 
   const handleListing = useCallback(async (id, listing) => {
     try {
-      if (listing === "available" && !window.confirm("Sure to Discontinue..")) {
+
+      const swalll = await Swal.fire({
+            title: 'Are you sure to Toggle listing',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',   
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, do it!',
+            cancelButtonText: 'Cancel'
+          })
+
+      if (listing === "available" && !swalll.isConfirmed) {
         return;
       }
 

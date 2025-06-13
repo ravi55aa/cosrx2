@@ -28,7 +28,9 @@ const OrdersPage = () => {
             return false;
         }
 
-        setOrderDataObj(response?.data?.orderData);
+        const reversedOrderData = await response?.data?.orderData;
+
+        setOrderDataObj(reversedOrderData);
     }
     useEffect(() => {
         fetchOrders();

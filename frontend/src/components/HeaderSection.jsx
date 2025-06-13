@@ -63,7 +63,6 @@ const HeaderSection = () => {
             <h1 className="text-2xl font-bold text-textLight">COSRX</h1>
           </div>
 
-          {/* Hamburger Menu Button (Visible on Mobile) */}
           <div className="md:hidden">
             <button onClick={toggleMenu} className="text-textLight">
               {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
@@ -101,12 +100,14 @@ const HeaderSection = () => {
                 </button>
             </Link>
             
-            <a
-              href="#"
-              className="flex items-center text-textLight hover:text-teal-500 transition-colors py-2 md:py-0"
-            >
-              <LuSwatchBook className="mr-1 " /> Contact
-            </a>
+            <Link to="/user/contactUs">
+              <button
+                type='button'
+                className="flex items-center text-textLight hover:text-teal-500 transition-colors py-2 md:py-0"
+              >
+                <LuSwatchBook className="mr-1 " /> Contact
+              </button>
+            </Link>
             <Link
               to="/user/wishlist"
               className="flex items-center text-textLight hover:text-teal-500 transition-colors py-2 md:py-0"

@@ -198,7 +198,7 @@ const AddAddress = () => {
                     className="mt-1 me-2 p-2 w-2/3 border rounded-md focus:ring-teal-500 focus:border-teal-500"
                     placeholder="Enter your postcode or ZIP"
                     maxLength={6}
-                    required
+                    
                   />
 
                     <button onClick={handleZipcode} type="button" className="px-2 py-1 rounded-xl text-center bg-[#124] text-white">
@@ -247,7 +247,7 @@ const AddAddress = () => {
                     onChange={handleChanges}
                     className="mt-1 p-2 w-full border rounded-md focus:ring-teal-500 focus:border-teal-500"
                     placeholder="Enter your phone number"
-                    required
+                    
                   />
                 </div>
                 <div>

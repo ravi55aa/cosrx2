@@ -57,7 +57,7 @@ const handleFetchWishlist = async (req, res) => {
         return;
 
     } catch (err) {
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ mission: "failed", message: "ServerError", Error: err.message });
     }
 };
@@ -133,7 +133,7 @@ const handleAddToWishlist = async (req, res) => {
         return;
 
     } catch (err) {
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ mission: "failed", message: "ServerError", Error: err.message });
     }
 };
@@ -192,7 +192,7 @@ const handleRemoveFromWishlist = async (req, res) => {
         return;
 
     } catch (err) {
-        console.log(err.message);
+        
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             mission: "failed",
             message: "ServerError",

@@ -43,7 +43,7 @@ const fetchData = async (req, res) => {
         });
 
     } catch (err) {
-        console.log(err.message);
+        
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             mission: "failed",
             message: "Server Error",

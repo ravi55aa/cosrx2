@@ -26,7 +26,7 @@ const authMiddleware =(req,res,next)=>{
 
     return res
             .status(HttpStatus.UNAUTHORIZED)
-            .json({ mission: "failed", message: "Unauthorized error" });
+            .json({ mission: "failed", message: "Unauthorized error",Error:err.message });
     }
 } 
 

@@ -73,7 +73,7 @@ const loadUsers = async (req, res) => {
     });
     return;
   } catch (err) {
-    console.log("server error");
+    
 
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       mission: "failed",
@@ -192,7 +192,7 @@ const loadCategory = async (req, res) => {
       total: total,
     });
   } catch (err) {
-    console.error(err.message);
+    
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ mission: "failed", message: "Server Error" });
@@ -218,7 +218,7 @@ const addCategory = async (req, res) => {
 
     if(categoryExist && Object?.keys(categoryExist)?.length > 0){
       if(categoryExist.isDelete == false){
-        console.log(3)
+        
         res
         .status(HttpStatus.OK)
         .json({ mission: "success", message: "Category already exist",alreadyExist:true });
@@ -264,7 +264,7 @@ const addCategory = async (req, res) => {
     return;
 
   } catch (err) {
-    console.error(err.message);
+    
 
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -304,7 +304,7 @@ const readdCategory = async(req,res)=>{
       return;
 
   } catch(err){
-    console.log(err.message);
+    
     res
     .status(HttpStatus.INTERNAL_SERVER_ERROR)
     .json({ mission: "failed", message: "Server Error",error:err.message });
@@ -378,7 +378,7 @@ const handleListing = async (req, res) => {
     });
     return;
   } catch (err) {
-    console.log(err.message);
+    
 
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -421,7 +421,7 @@ const handleDelete = async (req, res) => {
     });
     return;
   } catch (err) {
-    console.log(err.message);
+    
     res
       .status(HttpStatus.OK)
       .json({ mission: "failed", message: "Server Error", Error: err.message });
@@ -504,7 +504,7 @@ const handleEdit = async (req, res) => {
     return;
 
   } catch (err) {
-    console.log(err.message);
+    
     res
       .status(HttpStatus.OK)
       .json({ mission: "failed", message: "Server Error", Error: err.message });
@@ -521,7 +521,7 @@ const loadProducts = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [products, total] = await Promise.all([
-      productModel.find({ isBlocked: false }).populate("category").skip(skip).limit(limit),
+      productModel.find({ isBlocked: false }).populate("category").sort({createdAt:-1}).skip(skip).limit(limit),
       productModel.countDocuments(
         {$and : [ 
           {isBlocked: false},
@@ -548,7 +548,7 @@ const loadProducts = async (req, res) => {
     });
     return;
   } catch (err) {
-    console.error(err.message);
+    
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ mission: "failed", message: "Server Error" });
@@ -581,7 +581,7 @@ const checkProductExist = async (req, res) => {
       });
     }
   } catch (err) {
-    console.error(err.message);
+    
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ mission: "failed", message: "Server Error", error: err.message });
@@ -597,17 +597,12 @@ const addProducts = async (req, res) => {
       productCategory,
       skinType,
       productType,
-      regularPrice,
       salePrice,
       quantity,
       isBlocked,
       status,
       weight,
-      validOffer,
-      productOffer
     } = req.body;
-    console.log("salePrice",salePrice,"regularPrice",regularPrice);
-
     //validation error
     //------------------
     const errors = validateProduct(req.body);
@@ -658,10 +653,7 @@ const addProducts = async (req, res) => {
       category: productCategory,
       skinType,
       productType,
-      regularPrice: parseFloat(regularPrice || 0),
       salePrice: parseFloat(salePrice || 0),
-      productOffer: parseFloat(productOffer).toFixed(2),
-      validOffer: parseFloat(validOffer).toFixed(2),
       quantity,
       isBlocked,
       status,
@@ -679,7 +671,7 @@ const addProducts = async (req, res) => {
 
     return;
   } catch (err) {
-    console.error(err.message);
+    
 
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -694,7 +686,7 @@ const reAddProducts = async (req,res)=>{
     const {id} = req.params;
   
     const product = await productModel.findByIdAndUpdate(id,{isBlocked:false},{new:true});
-    console.log(product);
+    
 
     if(!product || product?.length <= 0 || Object?.keys(product).length <=0 ) {
       
@@ -708,7 +700,7 @@ const reAddProducts = async (req,res)=>{
     return;
 
   } catch(err){
-    console.error(err.message);
+    
 
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -730,17 +722,15 @@ const editProducts = async(req,res)=>{
       productCategory,
       skinType,
       productType,
-      regularPrice,
+      
       salePrice,
       quantity,
       isBlocked,
       status,
       images,
-      productOffer,
-      validOffer
     } = req.body;
 
-    console.log("the data i have recieved",req.body);
+    
     //validation error
     const errors = validateProduct(req.body);
     if (Object.keys(errors).length > 0) {
@@ -788,10 +778,7 @@ const editProducts = async(req,res)=>{
       category: foundCategory._id,
       skinType,
       productType,
-      regularPrice: parseFloat(regularPrice || 0),
       salePrice: parseFloat(salePrice || 0),
-      productOffer: parseFloat(productOffer).toFixed(2),
-      validOffer: parseFloat(validOffer).toFixed(2),
       quantity,
       isBlocked,
       status,
@@ -811,8 +798,6 @@ const editProducts = async(req,res)=>{
 
     return;
   } catch (err) {
-    console.error(err.message);
-
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ mission: "failed", message: "Server Error", error: err.message });
@@ -854,7 +839,7 @@ const deleteProducts=async (req,res) =>{
       });
       return;
     } catch (err) {
-      console.log(err.message);
+      
       res
         .status(HttpStatus.OK)
         .json({ mission: "failed", message: "Server Error", Error: err.message });
@@ -908,7 +893,7 @@ const listingProduct=async(req,res)=>{
     return;
 
   } catch (err) {
-    console.log(err.message);
+    
 
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)

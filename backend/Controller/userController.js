@@ -7,15 +7,17 @@ const {generateToken} = require("../Config/jwt")
 
 const otpGenerator = require("otp-generator");
 const { validationResult } = require("express-validator");
+const walletModel = require("../Model/wallet.js");
 
 const User = require("../Model/user");
 const cloudinary = require("../Config/cloudinary");
 const HttpStatus = require("../Config/HTTPstatusCodes");
 const sendOTP = require("../Config/nodeMailer");
+const {referralGenerate} = require("./userContBussines.js");
 
 const registerUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, referralCode } = req.body;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -26,38 +28,91 @@ const registerUser = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    
-    const newUser = new User({
+    let newUser = new User({
       firstName,
       lastName,
       email,
-      userName:firstName,
+      userName: firstName,
       password: hashedPassword,
-      googleId:hashedPassword+1
+      googleId: hashedPassword + 1,
+      referralCode: referralGenerate(),
     });
 
-    const payload = {
-      email:newUser.email,
-      id:newUser._id,
+    if (referralCode) {
+      let foundUser = await User.findOne({ referralCode: referralCode });
+
+      if (foundUser) {
+        
+        newUser.referrerCode = referralCode;
+        newUser.redeemed = true;
+        await newUser.save();
+
+        foundUser.redeemedUsers.push(newUser._id);
+        await foundUser.save();
+
+        const newUserTransaction = {
+          type: "credit",
+          amount: 50,
+          description: "Successfully credited the referral amount",
+          transactId: "Tran-" + Math.floor(Math.random() * 1000000) + "-Admin"
+        };
+
+        await new walletModel({
+          userId: newUser._id,
+          balance: 50,
+          transactions: [newUserTransaction],
+        }).save();
+
+        
+        const referrerWallet = await walletModel.findOne({ userId: foundUser._id });
+
+        const referrerTransaction = {
+          type: "credit",
+          amount: 50,
+          description: `Reward for referring ${newUser.email}`,
+          transactId: "Tran-" + Math.floor(Math.random() * 1000000) + "-Ref"
+        };
+
+        if (!referrerWallet) {
+          
+          await new walletModel({
+            userId: foundUser._id,
+            balance: 50,
+            transactions: [referrerTransaction],
+          }).save();
+        } else {
+          
+          await walletModel.updateOne(
+            { userId: foundUser._id },
+            {
+              $inc: { balance: 50 },
+              $push: { transactions: referrerTransaction }
+            }
+          );
+        }
+      }
     }
+
+    const payload = {
+      email: newUser.email,
+      id: newUser._id,
+    };
+
     const token = generateToken(payload);
     await newUser.save();
 
-    res
-      .status(201)
-      .json({
-        mission: "success",
-        message: "User registered successfully",
-        userId: newUser._id,
-        token:token
-      });
+    res.status(201).json({
+      mission: "success",
+      message: "User registered successfully",
+      userId: newUser._id,
+      token: token
+    });
 
-    return;
   } catch (error) {
-    console.error("Error registering user:", error);
+    
     res.status(500).json({ message: "Server error", Error: error.message });
   }
 };
@@ -66,27 +121,25 @@ const registerUserWithGoogle = async (payload) => {
   try {
     
     if (Object.keys(payload).length <= 0) {
-      console.log("email not found");
+      
       return false;
     }
 
     const { name, email, id,photo } = payload;
-    console.log("user Photo",photo);
-
     
     const userExist = await User.find({ email: email });
 
     if (userExist.length > 0 ) {
       return true;
     }
-
     
     const newUser = await new User({
       email: email,
       firstName:name,
       googleId:id,
       userName:name,
-      profilePicture:photo
+      profilePicture:photo,
+      referralCode:referralGenerate()
     }).save(); 
 
 
@@ -97,7 +150,7 @@ const registerUserWithGoogle = async (payload) => {
     return true;
 
   } catch (error) {
-    console.error("Error registering user:", error.message);
+    
 
     return false;
   }
@@ -136,7 +189,7 @@ const uploadUserImage = async (req, res) => {
     }
 
     const userObjectId = new mongoose.Types.ObjectId(userId);
-    console.log("userObjectId",userObjectId);
+    
 
     const updateImage = await User.findByIdAndUpdate(
       userObjectId,
@@ -222,8 +275,6 @@ const login = async (req, res) => {
 };
 
 const generateOtp = (req, res) => {
-  console.log("otp")
-
   try {
     const {token} = req.query;
   
@@ -249,7 +300,7 @@ const generateOtp = (req, res) => {
     }
  
     
-    console.log("decode",decode)
+    
     //NODE MAIL:
     sendOTP(decode.email,generateOTPis);
   
@@ -339,7 +390,7 @@ const homePageFetchData = async (req,res)=>{
 
     const {id} = req.params;
 
-    console.log(req.user)
+    
     
     if(!id) {
       res
@@ -351,7 +402,7 @@ const homePageFetchData = async (req,res)=>{
     const userId = new mongoose.Types.ObjectId(id);
   
     const user = await User.findOne({_id:userId});
-    console.log("user Is",user);
+    
   
     if(Object.keys(user).length  <= 0){
       res

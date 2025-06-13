@@ -28,45 +28,50 @@ const OrderList = () => {
                 return false;
             }
             const data = response?.data?.orderItems &&
-    response.data.orderItems
-    .map(subArray => {  
-        const seen = new Set();
-        return subArray.filter(ord => {
-            console.log(ord)
-            const productID = ord?.product
-            
-            if (!productID) return false;
-            if (seen.has(productID)) {
-                return false;
-            } else {
-                seen.add(productID);
-                return true;
-            }
-        });
-    })
+            response.data.orderItems
+            .map(subArray => {  
+                const seen = new Set();
+                return subArray.filter(ord => {
+
+                    const productID = ord?.product
+                    
+                    if (!productID) return false;
+                    
+                    if (seen.has(productID)) {
+                        return false;
+                    } else {
+                        seen.add(productID);
+                        return true;
+                    }
+                });
+            })
     .filter(subArray => subArray.length > 0);
 
-    console.log(data);
-
-        
-            setOrders(data);
-            setFilteredOrders(data);
+    const sortedOrders = data.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+    );  
+            setOrders(sortedOrders);
+            setFilteredOrders(sortedOrders);
+            console.log("the sorted orders is given by",sortedOrders)
             return true;
         }
 
         fetchAllOrderedItems();
     }, [navigate]);
 
+
     useEffect(() => {
         if (!searchQuery.trim()) {
-        setFilteredOrders(orders);
-        return;
+            setFilteredOrders(orders);
+            return;
         }
+        
         const filtered = orders?.map(subArray => 
             subArray?.filter(order => 
                 order?.orderId?.orderId?.toLowerCase().includes(searchQuery.toLowerCase())
             )
         ).filter(subArray => subArray.length > 0);         
+        
         setFilteredOrders(filtered);
     }, [searchQuery, orders]);
 
@@ -128,7 +133,7 @@ const OrderList = () => {
                 </div>
             ) : (
                 <div className="space-y-6">
-                {filteredOrders?.map((sOrders, index) => {
+                {filteredOrders?.reverse().map((sOrders, index) => {
                     if (sOrders.length === 0) return null; 
 
                     const mainOrder = sOrders[0];
@@ -178,14 +183,20 @@ const OrderList = () => {
                             <p key={idx} className="text-gray-600 text-sm">
                             {item?.name?.slice(0, 30)} (Qty: {item?.quantity})
                             </p>
+
+                            
                         ))}
             </div>
 
         {/* Footer */}
         <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-          <p className="text-gray-800 font-semibold">
+        <p className="text-gray-800 font-semibold">
             Total: 
-            <span>₹{mainOrder?.price}  </span>
+            <span>₹{
+            mainOrder?.orderId?.finalAmount > 50 ?
+            mainOrder?.orderId?.finalAmount
+            : 0
+            }  </span>
           </p>
           <Link to={`/user/order-details/${mainOrder?.orderId?.orderId}`}>
             <motion.button

@@ -1,4 +1,3 @@
-//sheema
 
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
@@ -92,10 +91,9 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now
     },
-    referralCode:{
+    referrerCode:{
         type: String,
         trim:true,
-        
     },
     redeemed:{
         type: Boolean,
@@ -124,8 +122,8 @@ const userSchema = new Schema({
 
 // Middleware to update `modifiedAt` on save
 userSchema.pre("save", function (next) {
-  this.modifiedAt = Date.now();
-  next();
+    this.modifiedAt = Date.now();
+    next();
 });
 
 

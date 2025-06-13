@@ -43,10 +43,7 @@ const EditProduct = () => {
     skinType: product?.skinType || "",
     productType: product?.productType || "",
     weight: product?.weight || "",
-    regularPrice: product?.regularPrice || "",
     salePrice: product?.salePrice || "",
-    productOffer: product?.productOffer || "",
-    validOffer: product?.validOffer || "",
     quantity: product?.quantity || "",
     isBlocked: product?.isBlocked || false,
     status: product?.status || "available",
@@ -96,18 +93,27 @@ const EditProduct = () => {
 
   const handleFields = () => {
     for (let key in formData) {
-      if (key === "isBlocked") continue;
+      if (key === "isBlocked"  ||  key === "validOffer") {
+        continue;
+      }
+
+      if(key == "productOffer"){
+        continue;
+      }
 
       if (key === "images" && formData[key].length < 3) {
         toast.info("Images are insufficient (min-3)");
         return false;
       }
 
+
       if (!formData[key] || (typeof formData[key] === "string" && !formData[key].trim())) {
+        console.log("this is working fine now")
         toast.info(`${key} is null`);
         return false;
       }
     }
+
     return true;
   };
 
@@ -356,7 +362,7 @@ const EditProduct = () => {
                   required
                 />
               </div>
-              <div>
+              {/* <div>
                 <label className="block text-gray-400 mb-1">Regular Price:</label>
                 <input
                   type="text"
@@ -367,7 +373,7 @@ const EditProduct = () => {
                   placeholder="Enter regular price"
                   required
                 />
-              </div>
+              </div> */}
               <div>
                 <label className="block text-gray-400 mb-1">Sale Price:</label>
                 <input
@@ -455,6 +461,9 @@ const EditProduct = () => {
                   </div>
                 )}
               </div>
+
+              {/* Temporary not available the offers */}
+              {/* 
               <div>
                 <label className="block text-gray-400 mb-1">Product Offer:</label>
                 <input
@@ -479,6 +488,8 @@ const EditProduct = () => {
                   required
                 />
               </div>
+              */}
+
               <div>
                 <label className="block text-gray-400 mb-1">Stock Count:</label>
                 <input

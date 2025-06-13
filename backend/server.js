@@ -21,6 +21,10 @@ const adminCategory = require("./Routes/Admin/Category/category");
 const adminUserManage = require("./Routes/Admin/UserManagement/user");
 const adminProducts = require("./Routes/Admin/productsManag/products");
 const adminOrders = require("./Routes/Admin/OrderMan/order");
+const OfferManageMent = require("./Routes/Admin/offer/index");
+const couponManageMent = require("./Routes/Admin/Coupon/index");
+const saleReportMange = require("./Routes/Admin/SaleReport/sale");
+const dashboardMange = require("./Routes/Admin/Dashboard/dashboard");
 
 const googlAuth = require("./Routes/googleAuth");
 const user_Authentication = require("./Routes/User/Authenticate/authenticaton");
@@ -32,16 +36,25 @@ const profileInfo = require("./Routes/User/Profile/personal");
 const manageCart = require("./Routes/user/Menu/cart");
 const manageWishlist = require("./Routes/user/Menu/wishlist");
 const orderManageMent = require("./Routes/user/order/order");
+const walletManageMent = require("./Routes/user/Profile/Wallet/Wallet.js");
 
-app.use((req,res,next)=>{
-    console.log(req.hostname)
+const razorPay = require("./Routes/Razorpay/razerPay.js");
+
+
+app.use((req, res, next) => {
+    console.log("Incoming:", req.method, req.path);
     next();
-})
+});
+
 
 app.use("/adminCat",adminCategory);
 app.use("/admin",adminUserManage);
 app.use("/adminPro",adminProducts);
 app.use("/adminOrd",adminOrders);
+app.use("/offer",OfferManageMent)
+app.use("/coupon",couponManageMent);
+app.use("/sales",saleReportMange);
+app.use("/dashboard",dashboardMange);
 
 app.use("/auth",googlAuth);
 app.use("/user",user_Authentication);
@@ -52,7 +65,9 @@ app.use("/productDetails",categoryManage);
 app.use("/cart",manageCart);
 app.use("/wishlist",manageWishlist);
 app.use("/order",orderManageMent);
+app.use("/wallet",walletManageMent);
 
+app.use("/razor",razorPay);
 //user_profile
 app.use("/profile",profileInfo);
 

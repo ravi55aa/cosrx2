@@ -39,10 +39,7 @@ function validateProduct(product) {
         productDescription,
         productFullDescription,
         productCategory ,
-        regularPrice,
         salePrice,
-        productOffer,
-        validOffer,
         quantity, 
         weight,
     } = product;
@@ -89,25 +86,23 @@ function validateProduct(product) {
     }
 
     // Validate regularPrice
-    if (!regularPrice) {
-        errors.regularPrice = 'Regular price is required';
-    } else if (regularPrice < 0) {
-        errors.regularPrice = 'Regular price must be a positive number.';
-    }else if( isNaN(regularPrice)) {
-        errors.regularPrice = 'pls enter a valid Regular price.';
-    } else if(regularPrice > 9999){
-        errors.salePrice = 'Sale price is exceeding the price limit';
-    }
+    // if (!regularPrice) {
+    //     errors.regularPrice = 'Regular price is required';
+    // } else if (regularPrice < 0) {
+    //     errors.regularPrice = 'Regular price must be a positive number.';
+    // }else if( isNaN(regularPrice)) {
+    //     errors.regularPrice = 'pls enter a valid Regular price.';
+    // } else if(regularPrice > 9999){
+    //     errors.salePrice = 'Sale price is exceeding the price limit';
+    // }
 
     // Validate salePrice
     if (!salePrice) {
         errors.salePrice = 'Sale price is required';
     } else if ( salePrice < 0) {
         errors.salePrice = 'Sale price must be a positive number.';
-    } else if (salePrice > regularPrice) {
-        errors.salePrice = 'Sale price must be less than or equal to regular price.';
     }else if( isNaN(salePrice)) {
-        errors.regularPrice = 'pls enter a valid Sale Price.';
+        errors.salePrice = 'pls enter a valid Sale Price.';
     } else if(salePrice > 9999){
         errors.salePrice = 'Sale price is exceeding the price limit';
     }
@@ -115,11 +110,11 @@ function validateProduct(product) {
     if (!weight) {
         errors.weight = 'weight is required';
     } else if (weight < 0) {
-        errors.regularPrice = 'weight must be a positive number.';
+        errors.weight = 'weight must be a positive number.';
     }else if( isNaN(weight)) {
-        errors.regularPrice = 'pls enter a valid weight.';
+        errors.weight = 'pls enter a valid weight.';
     } else if(weight > 999){
-        errors.regularPrice = 'pls enter a valid amount of  weight.';
+        errors.weight = 'pls enter a valid amount of  weight.';
     }
 
     // Validate quantity
@@ -130,28 +125,28 @@ function validateProduct(product) {
     } else if ( isNaN(quantity)) {
         errors.quantity = ' pls enter a valid Quantity ';
     } else if(quantity > 100){
-        errors.regularPrice = 'Max reach of the quantity has been reached';
+        errors.quantity = 'Max reach of the quantity has been reached';
     }
 
-    if(productOffer < 0){
-        errors.product = "Offer cannot be a -ve Number";
-    } else if(isNaN(productOffer)) {
-        errors.productOffer = "pls Enter a valid Product offer"
-    } else if(productOffer > 100){
-        errors.regularPrice = 'Offer cannot be greater than 100.';
-    } else if(productOffer > validOffer){
-        errors.regularPrice = 'productOFfer should be less than validOFffer.';
-    }
+    // if(productOffer < 0){
+    //     errors.product = "Offer cannot be a -ve Number";
+    // } else if(isNaN(productOffer)) {
+    //     errors.productOffer = "pls Enter a valid Product offer"
+    // } else if(productOffer > 100){
+    //     errors.regularPrice = 'Offer cannot be greater than 100.';
+    // } else if(productOffer > validOffer){
+    //     errors.regularPrice = 'productOFfer should be less than validOFffer.';
+    // }
 
-    if(validOffer < 0){
-        errors.product = "Offer cannot be a -ve Number";
-    } else if(isNaN(validOffer)) {
-        errors.productOffer = "pls Enter a valid Product offer"
-    } else if(validOffer > 100){
-        errors.regularPrice = 'Offer cannot be greater than 100.';
-    } else if(validOffer < productOffer){
-        errors.regularPrice = 'validOffer should be less than validOFffe';
-    }
+    // if(validOffer < 0){
+    //     errors.product = "Offer cannot be a -ve Number";
+    // } else if(isNaN(validOffer)) {
+    //     errors.productOffer = "pls Enter a valid Product offer"
+    // } else if(validOffer > 100){
+    //     errors.regularPrice = 'Offer cannot be greater than 100.';
+    // } else if(validOffer < productOffer){
+    //     errors.regularPrice = 'validOffer should be less than validOFffe';
+    // }
 
     return errors;
 }

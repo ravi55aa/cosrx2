@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
+import Swal from 'sweetalert2'
 import {
   Bars3Icon,
   XMarkIcon,
@@ -17,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { updateAddProducts } from "#/admin/users/Product";
 import axiosBaseUrl from "$/axios";
 import { ClipLoader } from "react-spinners";
-import Swal from "sweetalert2"; // Import Swal
+
 
 const AddProduct = () => {
   const dispatch = useDispatch();
@@ -35,11 +36,8 @@ const AddProduct = () => {
     productType: "",
     skinType: " ",
     productCategory: "",
-    regularPrice: "",
     salePrice: "",
     weight: "",
-    productOffer: "",
-    validOffer: "",
     quantity: "",
     isBlocked: false,
     status: "available",
@@ -200,6 +198,8 @@ const AddProduct = () => {
         return false;
       }
 
+      console.log("Lets check the formdData",formData);
+
       axiosBaseUrl
         .post("/adminPro/products/add", newFormData)
         .then((res) => {
@@ -356,7 +356,7 @@ const AddProduct = () => {
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   placeholder="Enter product name"
-                  required
+                  
                 />
               </div>
               <div>
@@ -368,7 +368,7 @@ const AddProduct = () => {
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   rows="3"
                   placeholder="Enter product description"
-                  required
+                  
                 />
               </div>
               <div>
@@ -380,7 +380,7 @@ const AddProduct = () => {
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   rows="3"
                   placeholder="Enter product description"
-                  required
+                  
                 />
               </div>
               <div>
@@ -439,10 +439,10 @@ const AddProduct = () => {
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   placeholder="Enter brand name"
-                  required
+                  
                 />
               </div>
-              <div>
+              {/* <div>
                 <label className="block text-gray-400 mb-1">Regular Price:</label>
                 <input
                   type="text"
@@ -451,9 +451,9 @@ const AddProduct = () => {
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   placeholder="Enter brand name"
-                  required
+                  
                 />
-              </div>
+              </div> */}
               <div>
                 <label className="block text-gray-400 mb-1">Sale Price:</label>
                 <input
@@ -463,7 +463,7 @@ const AddProduct = () => {
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   placeholder="Enter brand name"
-                  required
+                  
                 />
               </div>
               <div className="gap-3 flex">
@@ -537,7 +537,7 @@ const AddProduct = () => {
                   </div>
                 )}
               </div>
-              <div>
+              {/* <div>
                 <label className="block text-gray-400 mb-1">Product Offer:</label>
                 <input
                   type="number"
@@ -546,7 +546,7 @@ const AddProduct = () => {
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   placeholder="Enter product amount"
-                  required
+                  
                 />
               </div>
               <div>
@@ -558,9 +558,9 @@ const AddProduct = () => {
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   placeholder="Enter product amount"
-                  required
+                  
                 />
-              </div>
+              </div> */}
               <div>
                 <label className="block text-gray-400 mb-1">Stock Count:</label>
                 <input
@@ -570,7 +570,7 @@ const AddProduct = () => {
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
                   placeholder="Enter stock count"
-                  required
+                  
                 />
               </div>
               <div>
