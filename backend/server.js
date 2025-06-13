@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 const cors = require("cors");
-app.use(cors({origin:"http://localhost:5173",allowedHeaders:"Authorization,Content-Type",credentials:true}));
+app.use(cors({origin:"*",credentials:true}));
 //replace * with my frotnend URL
 //if iam pushing the project into the github 
 //Later you can access to into here;
@@ -69,6 +69,10 @@ app.use("/wallet",walletManageMent);
 app.use("/razor",razorPay);
 //user_profile
 app.use("/profile",profileInfo);
+
+app.get("/health", (req, res) => {
+  return res.status(200).json({ status: "OK", message: "Backend is healthy!" });
+});
 
 app.get("/*",(req,res)=>{
     res.status(404).json({mission:"failed",message:"page not found"});
