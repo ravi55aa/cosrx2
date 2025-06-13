@@ -33,13 +33,12 @@ const categoryManage = require("./Routes/User/Menu/category");
 const productDetails = require("./Routes/productDetails");
 
 const profileInfo = require("./Routes/User/Profile/personal");
-const manageCart = require("./Routes/user/Menu/cart");
-const manageWishlist = require("./Routes/user/Menu/wishlist");
-const orderManageMent = require("./Routes/user/order/order");
-const walletManageMent = require("./Routes/user/Profile/Wallet/Wallet.js");
+const manageCart = require("./Routes/User/Menu/cart");
+const manageWishlist = require("./Routes/User/Menu/wishlist");
+const orderManageMent = require("./Routes/User/order/order");
+const walletManageMent = require("./Routes/User/Profile/Wallet/Wallet.js");
 
 const razorPay = require("./Routes/Razorpay/razerPay.js");
-
 
 app.use((req, res, next) => {
     console.log("Incoming:", req.method, req.path);
