@@ -8,7 +8,6 @@ const ConnectDB = async()=>{
         console.log("mongodb",mongoConnection.connection.host);
 
     } catch(err) {
-
         console.log("Error-Connecting-Database");
         throw new Error(err.message);
     }

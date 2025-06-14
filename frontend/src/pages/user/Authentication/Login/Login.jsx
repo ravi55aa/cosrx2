@@ -263,7 +263,7 @@ const Login = () => {
             data-aos-delay="600"
           >
             Don’t have an account?{" "}
-            <a href="http://localhost:5173/user/register" className="text-teal-500 hover:underline">
+            <a href="https://thecosrx.shop/user/register" className="text-teal-500 hover:underline">
               Sign Up
             </a>
           </p>
@@ -273,7 +273,7 @@ const Login = () => {
             data-aos-delay="600"
           >
             Don’t have an account?{" "}
-            <a href="http://localhost:5173/user/register" className="text-teal-500 hover:underline">
+            <a href="https://thecosrx.shop/user/register" className="text-teal-500 hover:underline">
               Sign Up
             </a>
           </p>
