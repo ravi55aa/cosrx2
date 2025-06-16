@@ -17,7 +17,7 @@ router.get("/google/callback", passport.authenticate("google", { session: false 
     const { name, email, photo, token,googleId } = req.user;
         
     res.redirect(
-      `http://localhost:5173/user/google-auth?token=${token}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&photo=${encodeURIComponent(photo)}&id=${encodeURIComponent(googleId)}`
+      `https://thecosrx.shop/user/google-auth?token=${token}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&photo=${encodeURIComponent(photo)}&id=${encodeURIComponent(googleId)}`
     );    
     
   });
